@@ -16,7 +16,7 @@ def get_data(dataset_name):
     """
     if dataset_name == 'cifar10':
         (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
-    if dataset_name == 'cifar10-avioncitos':
+    if dataset_name == 'cifar10-planes':
         (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
         indx = np.where(train_labels == 0)[0] # we choose only one specific domain from the dataset  0 -> Avioncitos
         train_images=augment(train_images[indx])

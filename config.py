@@ -12,10 +12,11 @@ training_phase_epoch                = 1                         # Training phase
 transition_phase_epoch              = 1                         # Transition phase epoch
 print_steps                         = 20                        # Step to print log results and generate images
 save_images_epochs                  = 1                         # Save images at epoch number
-
+save_model_epochs                   = 1                         # Save model at epoch
 
 # Dataset (choose one)
-desc += '-cifar10';             dataset_name = 'cifar10';           resolution = 32;
+#desc += '-cifar10';             dataset_name = 'cifar10';           resolution = 32;
+desc += '-cifar10-planes';             dataset_name = 'cifar10-planes';           resolution = 32;
 # desc += '-acdc';                dataset_name = 'acdc';              resolution = 256;    
 
 checkpoint_dir = os.path.join('results', desc)
