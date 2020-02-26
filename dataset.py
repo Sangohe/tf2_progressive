@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
+import misc
+import config
 
 def get_data(dataset_name):
     """Returns the set of images and labels from a desired dataset.
@@ -14,7 +16,13 @@ def get_data(dataset_name):
     """
     if dataset_name == 'cifar10':
         (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
-
+    if dataset_name == 'cifar10-avioncitos':
+        (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
+        indx = np.where(train_labels == 0)[0] # we choose only one specific domain from the dataset  0 -> Avioncitos
+        train_images=augment(train_images[indx])
+        train_labels=np.ones((train_images.shape))
+    if(train_images.shape[0]%config.batch_size!=0): # we reduce the dataset to be taken by batches.  
+        train_images=train_images[:-(train_images.shape[0]%config.batch_size),...]
     # Normalize the images to [-1, 1]
     train_images = train_images.astype('float32')
     train_images = (train_images - 127.5) / 127.5

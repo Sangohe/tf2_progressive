@@ -105,3 +105,18 @@ def print_or_save_sample_images(sample_images, max_print_size=config.num_example
         plt.savefig(filepath)
     else:
         plt.show()
+
+def augment(data):
+    #corre un pixel a lo largo de x y los concatena.
+    off_x_p = data.copy()    
+    off_x_p[:,1:,:,:] = off_x_p[:,:-1,:,:]
+    off_x_m = data.copy()
+    off_x_p[:,:-1,:,:] = off_x_p[:,1:,:,:]
+    data = np.concatenate((data,off_x_p,off_x_m), axis = 0)
+    #corre un pixel a lo largo de y y los concatena.
+    off_y_p = data.copy()
+    off_y_p[:,:,1:,:] = off_y_p[:,:,:-1,:]
+    off_y_m = data.copy()
+    off_y_m[:,:,:-1,:] = off_y_m[:,:,1:,:]
+    data = np.concatenate((data,off_y_p,off_y_m), axis = 0)    
+    return data
