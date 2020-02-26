@@ -192,4 +192,4 @@ for resolution, train_dataset in enumerate(train_datasets[1:]):
         if (epoch + 1) % config.save_model_epochs == 0:
             checkpoint.save(file_prefix=checkpoint_prefix)
     
-print('Training done')
+print('======= Training done =======')
