@@ -19,7 +19,8 @@ def get_data(dataset_name):
     if dataset_name == 'cifar10-planes':
         (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
         indx = np.where(train_labels == 0)[0] # we choose only one specific domain from the dataset  0 -> Avioncitos
-        train_images=augment(train_images[indx])
+        #train_images=misc.augment(train_images[indx])
+        train_images=train_images[indx]
         train_labels=np.ones((train_images.shape))
     if(train_images.shape[0]%config.batch_size!=0): # we reduce the dataset to be taken by batches.  
         train_images=train_images[:-(train_images.shape[0]%config.batch_size),...]

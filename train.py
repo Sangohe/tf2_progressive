@@ -183,7 +183,7 @@ for resolution, train_dataset in enumerate(train_datasets[1:]):
 
         if (epoch + 1) % config.save_images_epochs == 0:
             print("This images are saved at {} epoch".format(epoch+1))
-            sample_images = generator(const_random_vector_for_saving, training=False)
+            sample_images = generator(const_random_vector_for_saving,current_resolution,'training', training=False)
             misc.print_or_save_sample_images(sample_images.numpy(), config.num_examples_to_generate,
                                         is_square=True, is_save=True, epoch=epoch+1,
                                         checkpoint_dir=config.checkpoint_dir)

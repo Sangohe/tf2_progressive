@@ -1,4 +1,6 @@
 import time
+import os
+import numpy as np
 import tensorflow as tf
 from tabulate import tabulate
 import matplotlib.pyplot as plt
