@@ -16,7 +16,6 @@ save_images_epochs                  = 1                         # Save images at
 
 # Dataset (choose one)
 desc += '-cifar10';             dataset_name = 'cifar10';           resolution = 32;
-desc += '-cifar10-avioncitos';  dataset_name = 'cifar10';           resolution = 32;
 # desc += '-acdc';                dataset_name = 'acdc';              resolution = 256;    
 
 checkpoint_dir = os.path.join('results', desc)
