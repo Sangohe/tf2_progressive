@@ -2,10 +2,11 @@ import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
  
 # The GPU id to use, usually either "0" or "1";
-os.environ["CUDA_VISIBLE_DEVICES"]="0";  
+os.environ["CUDA_VISIBLE_DEVICES"] = "";  
 
 # Libraries
 import time
+import glob
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -37,7 +38,7 @@ def get_generator_tvars(current_resolution):
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
 @tf.function
-def discriminator_train_step(images, current_resolution, current_phase, alpha=0.0):
+def discriminator_train_step(images, current_resolution, current_phase, alpha=tf.constant(0.0)):
     # generating noise from a uniform distribution
     noise = tf.random.uniform([config.batch_size, config.noise_dim], minval=-1.0, maxval=1.0)
 
@@ -49,7 +50,8 @@ def discriminator_train_step(images, current_resolution, current_phase, alpha=0.
     
         # interpolation of x hat for gradient penalty : epsilon * real image + (1 - epsilon) * generated image
         epsilon = tf.random.uniform([config.batch_size, 1, 1, 1])
-        # epsilon = tf.expand_dims(tf.stack([tf.stack([epsilon]*current_resolution, axis=1)]*current_resolution, axis=1), axis=3)
+        # epsilon = tf.expand_dims(tf.stac
+        # k([tf.stack([epsilon]*current_resolution, axis=1)]*current_resolution, axis=1), axis=3)
         interpolated_images_4gp = epsilon * images + (1. - epsilon) * generated_images
         with tf.GradientTape() as gp_tape:
             gp_tape.watch(interpolated_images_4gp)
@@ -71,7 +73,7 @@ def discriminator_train_step(images, current_resolution, current_phase, alpha=0.
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
 @tf.function
-def generator_train_step(current_resolution, current_phase, alpha=0.0):
+def generator_train_step(current_resolution, current_phase, alpha=tf.constant(0.0)):
     # generating noise from a uniform distribution
     noise = tf.random.uniform([config.batch_size, config.noise_dim], minval=-1.0, maxval=1.0)
 
@@ -85,22 +87,10 @@ def generator_train_step(current_resolution, current_phase, alpha=0.0):
     gradients_of_generator = gen_tape.gradient(gen_loss, g_tvars)
     generator_optimizer.apply_gradients(zip(gradients_of_generator, g_tvars))
 
-# Load the dataset
-(train_images, train_labels) = dataset.get_data(config.dataset_name)
-train_datasets = [dataset.create_dataset(train_images, 2**lod, config.batch_size) for lod in range(2, np.log2(config.resolution).astype(int) + 1)]
-
-# Train parameters
-dataset_attributes = [
-    ['Dataset name', config.dataset_name], 
-    ['Number of images in dataset', train_images.shape[0]], 
-    ['Images values are in', '[{}, {}]'.format(np.min(train_images), np.max(train_images))]
-]
-
-misc.print_as_table(dataset_attributes, headers=['Parameter', 'Value'])
-
 # Build the networks
-generator = networks.Generator()
-discriminator = networks.Discriminator()
+TARGET_SIZE = config.resolution
+generator = networks.Generator(TARGET_SIZE)
+discriminator = networks.Discriminator(TARGET_SIZE)
 
 # Optimizers
 discriminator_optimizer = tf.keras.optimizers.Adam(config.learning_rate_D, beta_1=0.0, beta_2=0.99, epsilon=1e-8)
@@ -119,23 +109,38 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
 const_random_vector_for_saving = tf.random.uniform([config.num_examples_to_generate, config.noise_dim], minval=-1.0, maxval=1.0, seed=config.random_seed)
 
 # Initialize full size networks for making full size static graph
-TARGET_SIZE = config.resolution
 _, _ = discriminator_train_step(tf.random.normal([config.batch_size, TARGET_SIZE, TARGET_SIZE, 3]), TARGET_SIZE, 'transition')
 generator_train_step(TARGET_SIZE, 'transition')
 
 generator.summary()
 discriminator.summary()
 
-print('Start Training.')
+print('\nStart Training. \n--------------------------------------------')
 num_batches_per_epoch = int(train_images.shape[0] / config.batch_size)
 global_step = 1 
 global_epoch = 0
 num_learning_critic = 0
 
+# Load the dataset paths
+train_images_paths = sorted(glob.glob(os.path.join('datasets', config.dataset_name, '*images*')))
+train_labels_path = glob.glob(os.path.join('datasets', config.dataset_name, '*labels*'))
+train_dataset = dataset.create_dataset(np.load(train_images_paths[0], normalized=True))
+
+# Train parameters
+dataset_attributes = [
+    ['Dataset name', config.dataset_name], 
+    ['Number of datasets', len(train_images_paths)], 
+    ['Dataset includes labels', 'True' if not train_labels_path else 'False']
+]
+
+misc.print_as_table(dataset_attributes, headers=['Parameter', 'Value'])
+
+#FALTA DATASET
+
 # 4 x 4 training phase
 current_resolution = 4
 for epoch in range(config.training_phase_epoch):
-    for step, images in enumerate(train_datasets[0]):
+    for step, images in enumerate(train_dataset):
         start_time = time.time()
         
         gen_loss, disc_loss = discriminator_train_step(images, current_resolution, 'training')
@@ -152,21 +157,23 @@ for resolution, train_dataset in enumerate(train_datasets[1:]):
     current_resolution = 2**(resolution+3)
     
     # transition phase
+    print('\nTransition phase. Current resolution: {} \n--------------------------------------------'.format(current_resolution))
     for epoch in range(config.transition_phase_epoch):
         for step, images in enumerate(train_dataset):
             start_time = time.time()
             alpha = (epoch * num_batches_per_epoch + step) / float(config.transition_phase_epoch * num_batches_per_epoch)
-            gen_loss, disc_loss = discriminator_train_step(images, current_resolution, 'transition', alpha)
-            generator_train_step(current_resolution, 'transition', alpha)
+            gen_loss, disc_loss = discriminator_train_step(images, current_resolution, 'transition', tf.constant(alpha))
+            generator_train_step(current_resolution, 'transition', tf.constant(alpha))
         
             if global_step % (config.print_steps//current_resolution) == 0:
                 misc.print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time, disc_loss, gen_loss)
-                misc.print_samples(generator, current_resolution, const_random_vector_for_saving)
+                misc.save_image_grid(generator, checkpoint_dir, global_step, random_vector_for_sampling=const_random_vector_for_saving)
         
             global_step += 1
         global_epoch += 1
         
     # training phase
+    print('\nTraining phase. Current resolution: {} \n--------------------------------------------'.format(current_resolution))
     for epoch in range(config.training_phase_epoch):
         for step, images in enumerate(train_dataset):
             start_time = time.time()
@@ -175,7 +182,7 @@ for resolution, train_dataset in enumerate(train_datasets[1:]):
         
             if global_step % (config.print_steps//current_resolution) == 0:
                 misc.print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time, disc_loss, gen_loss)
-                misc.print_samples(generator, current_resolution, const_random_vector_for_saving)
+                misc.save_image_grid(generator, checkpoint_dir, global_step, random_vector_for_sampling=const_random_vector_for_saving)
         
             global_step += 1
         global_epoch += 1
@@ -184,9 +191,7 @@ for resolution, train_dataset in enumerate(train_datasets[1:]):
         if (epoch + 1) % config.save_images_epochs == 0:
             print("This images are saved at {} epoch".format(epoch+1))
             sample_images = generator(const_random_vector_for_saving,current_resolution,'training', training=False)
-            misc.print_or_save_sample_images(sample_images.numpy(), config.num_examples_to_generate,
-                                        is_square=True, is_save=True, epoch=epoch+1,
-                                        checkpoint_dir=config.checkpoint_dir)
+            misc.save_image_grid(generator, checkpoint_dir, epoch, random_vector_for_sampling=const_random_vector_for_saving)
 
         # saving (checkpoint) the model every save_epochs
         if (epoch + 1) % config.save_model_epochs == 0:

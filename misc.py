@@ -1,5 +1,6 @@
 import time
 import os
+import cv2
 import numpy as np
 import tensorflow as tf
 from tabulate import tabulate
@@ -107,6 +108,34 @@ def print_or_save_sample_images(sample_images, max_print_size=config.num_example
         plt.savefig(filepath)
     else:
         plt.show()
+
+def save_image_grid(generator, checkpoint_dir, global_step, random_vector_for_sampling=None):
+    """[summary]
+    
+    Arguments:
+        generator {tf.keras.Model} -- The generator network
+        checkpoint_dir {String} -- The checkpoint directory path to save images
+        global_step {int} -- Execution's global step
+    
+    Keyword Arguments:
+        random_vector_for_sampling {Tensor} -- Seed (default: {None})
+    """
+    if random_vector_for_sampling is None:
+        random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, noise_dim],
+                                                    minval=-1.0, maxval=1.0)
+    images = generator(random_vector_for_sampling, current_resolution, 'training')
+
+    num, height, width, channels = images.shape
+    assert height == width
+    dim = np.sqrt(num).astype(int)
+    rows, row_num = [], 0
+    
+    while row_num < dim:
+        rows.append(np.hstack(images[row_num * dim:(row_num + 1) * dim]))
+        row_num+=1
+        
+    cv2.imwrite(os.path.join(checkpoint_dir, 'fake{:06}'.format(global_step)), np.vstack(rows))
+    
 
 def augment(data):
     #corre un pixel a lo largo de x y los concatena.

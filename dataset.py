@@ -30,6 +30,19 @@ def get_data(dataset_name):
 
     return (train_images, train_labels)
 
+def normalize(images):
+    """Takes a set of images and normalize its values to [-1, 1]
+    
+    Arguments:
+        images {Array} -- Set of images
+    
+    Returns:
+        Array -- [-1, 1] normalized images
+    """
+    images = images.astype('float32')
+    images = (images - 127.5) / 127.5
+    return images
+
 def resize(image, size):
     """Converts an image into a tensor and resize it to [size, size]
     
@@ -42,7 +55,7 @@ def resize(image, size):
     """
     return tf.image.resize(image, [size, size], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
-def create_dataset(images, resolution, batch_size):
+def create_dataset(images, resolution, batch_size, normalize=True):
     """Takes an array of images and creates a Tensorflow dataset
     with dimensions: [resolution, resolution]
     
@@ -51,9 +64,16 @@ def create_dataset(images, resolution, batch_size):
         resolution {int} -- Final resolution for each image
         batch_size {int} -- Size to make batches from tensor
     
+    Keyword Arguments:
+        normalize {boolean} -- Flag (default: {True})
+
     Returns:
         [type] -- Tensorflow dataset object to feed the networks
     """
+    if normalize:
+        images = images.astype('float32')
+        images = (images - 127.5) / 127.5
+
     dataset = tf.data.Dataset.from_tensor_slices(images)
     dataset = dataset.shuffle(buffer_size=images.shape[0])
     dataset = dataset.map(lambda img: resize(img, resolution))
