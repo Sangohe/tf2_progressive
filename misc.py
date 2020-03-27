@@ -123,7 +123,7 @@ def save_image_grid(generator, current_resolution, checkpoint_dir, global_step, 
     if random_vector_for_sampling is None:
         random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, config.noise_dim],
                                                     minval=-1.0, maxval=1.0)
-    images = generator(random_vector_for_sampling, current_resolution, 'training')
+    images = generator(random_vector_for_sampling, current_resolution, 'training').numpy()
     print('image range [{},{}]'.format(images.min(), images.max()))
 
     num, height, width, _ = images.shape
