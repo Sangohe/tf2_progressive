@@ -120,13 +120,13 @@ discriminator.summary()
 global_step = 1 
 global_epoch = 0
 num_learning_critic = 0
-num_batches_per_epoch = int(train_images.shape[0] / config.batch_size)
 
 # Load the dataset paths
 print('\nLoading dataset. \n--------------------------------------------')
 train_images_paths = sorted(glob.glob(os.path.join('datasets', config.dataset_name, '*images*')))
 train_labels_path = glob.glob(os.path.join('datasets', config.dataset_name, '*labels*'))
 train_dataset = dataset.create_dataset(np.load(train_images_paths[0], normalized=True))
+num_batches_per_epoch = int(len(list(train_dataset.unbatch())) / config.batch_size)
 
 # Train parameters
 dataset_attributes = [
