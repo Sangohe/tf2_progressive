@@ -134,7 +134,7 @@ def save_image_grid(generator, current_resolution, checkpoint_dir, global_step, 
         rows.append(np.hstack(images[row_num * dim:(row_num + 1) * dim]))
         row_num+=1
         
-    plt.imsave(os.path.join(checkpoint_dir, 'fake{:06}.png'.format(global_step)), np.vstack(rows))
+    np.save(os.path.join(checkpoint_dir, 'fake{:06}.png'.format(global_step)), np.vstack(rows))
     
 
 def augment(data):
