@@ -88,6 +88,7 @@ def generator_train_step(current_resolution, current_phase, alpha=tf.constant(0.
     generator_optimizer.apply_gradients(zip(gradients_of_generator, g_tvars))
 
 # Build the networks
+print('\nInitializing the networks. \n----------------------------------')
 TARGET_SIZE = config.resolution
 generator = networks.Generator(TARGET_SIZE)
 discriminator = networks.Discriminator(TARGET_SIZE)
@@ -115,13 +116,14 @@ generator_train_step(TARGET_SIZE, 'transition')
 generator.summary()
 discriminator.summary()
 
-print('\nStart Training. \n--------------------------------------------')
-num_batches_per_epoch = int(train_images.shape[0] / config.batch_size)
+# Training variables
 global_step = 1 
 global_epoch = 0
 num_learning_critic = 0
+num_batches_per_epoch = int(train_images.shape[0] / config.batch_size)
 
 # Load the dataset paths
+print('\nLoading dataset. \n--------------------------------------------')
 train_images_paths = sorted(glob.glob(os.path.join('datasets', config.dataset_name, '*images*')))
 train_labels_path = glob.glob(os.path.join('datasets', config.dataset_name, '*labels*'))
 train_dataset = dataset.create_dataset(np.load(train_images_paths[0], normalized=True))
@@ -135,8 +137,8 @@ dataset_attributes = [
 
 misc.print_as_table(dataset_attributes, headers=['Parameter', 'Value'])
 
-#FALTA DATASET
-
+# TRAINING
+print('\nStart Training. \n---------------------------------------------')
 # 4 x 4 training phase
 current_resolution = 4
 for epoch in range(config.training_phase_epoch):
@@ -153,7 +155,8 @@ for epoch in range(config.training_phase_epoch):
     global_epoch += 1
 
 
-for resolution, train_dataset in enumerate(train_datasets[1:]):
+for resolution, train_dataset_path in enumerate(train_images_paths[1:]):
+    train_dataset = dataset.create_dataset(np.load(train_dataset_path, normalized=True))
     current_resolution = 2**(resolution+3)
     
     # transition phase
