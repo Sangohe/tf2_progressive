@@ -125,7 +125,7 @@ num_learning_critic = 0
 print('\nLoading dataset. \n--------------------------------------------')
 train_images_paths = sorted(glob.glob(os.path.join('datasets', config.dataset_name, '*images*')))
 train_labels_path = glob.glob(os.path.join('datasets', config.dataset_name, '*labels*'))
-train_dataset = dataset.create_dataset(np.load(train_images_paths[0], normalized=True))
+train_dataset = dataset.create_dataset(np.load(train_images_paths[0]), normalized=True)
 num_batches_per_epoch = int(len(list(train_dataset.unbatch())) / config.batch_size)
 
 # Train parameters
@@ -156,7 +156,7 @@ for epoch in range(config.training_phase_epoch):
 
 
 for resolution, train_dataset_path in enumerate(train_images_paths[1:]):
-    train_dataset = dataset.create_dataset(np.load(train_dataset_path, normalized=True))
+    train_dataset = dataset.create_dataset(np.load(train_dataset_path), normalized=True)
     current_resolution = 2**(resolution+3)
     
     # transition phase
