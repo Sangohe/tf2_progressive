@@ -55,13 +55,11 @@ def resize(image, size):
     """
     return tf.image.resize(image, [size, size], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
-def create_dataset(images, resolution, batch_size, normalize=True):
+def create_dataset(images, batch_size, normalize=True):
     """Takes an array of images and creates a Tensorflow dataset
-    with dimensions: [resolution, resolution]
     
     Arguments:
         images {array} -- An array containing all the images
-        resolution {int} -- Final resolution for each image
         batch_size {int} -- Size to make batches from tensor
     
     Keyword Arguments:
@@ -76,7 +74,6 @@ def create_dataset(images, resolution, batch_size, normalize=True):
 
     dataset = tf.data.Dataset.from_tensor_slices(images)
     dataset = dataset.shuffle(buffer_size=images.shape[0])
-    dataset = dataset.map(lambda img: resize(img, resolution))
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=True)
     
     return dataset
