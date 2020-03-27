@@ -3,7 +3,7 @@ import os
 desc                                = 'pgan'                    # Description string included in result subdir name.
 random_seed                         = 69                        # Global random seed.
 batch_size                          = 16                        # Size for batches
-noise_dim                           = 64                        # Size for the latent space vector
+noise_dim                           = 128                       # Size for the latent space vector
 learning_rate_D                     = 1e-3                      # Discriminator's learning rate
 learning_rate_G                     = 1e-3                      # Discriminator's learning rate
 gp_lambda                           = 10                        # Grandient Penalty Lambda

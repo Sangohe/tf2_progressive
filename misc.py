@@ -55,7 +55,7 @@ def print_samples(generator, current_resolution, random_vector_for_sampling=None
         random_vector_for_sampling {[type]} -- [description] (default: {None})
     """
     if random_vector_for_sampling is None:
-        random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, noise_dim],
+        random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, config.noise_dim],
                                                     minval=-1.0, maxval=1.0)
     sample_images = generator(random_vector_for_sampling, current_resolution, 'training')
     print_or_save_sample_images(sample_images.numpy(), config.num_examples_to_generate, is_save=True)            
@@ -121,11 +121,12 @@ def save_image_grid(generator, current_resolution, checkpoint_dir, global_step, 
         random_vector_for_sampling {Tensor} -- Seed (default: {None})
     """
     if random_vector_for_sampling is None:
-        random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, noise_dim],
+        random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, config.noise_dim],
                                                     minval=-1.0, maxval=1.0)
     images = generator(random_vector_for_sampling, current_resolution, 'training')
+    print('image range [{},{}]'.format(images.min(), images.max()))
 
-    num, height, width, channels = images.shape
+    num, height, width, _ = images.shape
     assert height == width
     dim = np.sqrt(num).astype(int)
     rows, row_num = [], 0
