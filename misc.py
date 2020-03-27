@@ -109,7 +109,7 @@ def print_or_save_sample_images(sample_images, max_print_size=config.num_example
     else:
         plt.show()
 
-def save_image_grid(generator, checkpoint_dir, global_step, random_vector_for_sampling=None):
+def save_image_grid(generator, current_resolution, checkpoint_dir, global_step, random_vector_for_sampling=None):
     """[summary]
     
     Arguments:
