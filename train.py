@@ -149,7 +149,7 @@ for epoch in range(config.training_phase_epoch):
         generator_train_step(current_resolution, 'training')
         if global_step % (config.print_steps//current_resolution) == 0:
             misc.print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time, disc_loss, gen_loss)
-            misc.print_samples(generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
+            misc.print_samples(checkpoint_dir, generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
         
         global_step += 1
     global_epoch += 1
@@ -170,7 +170,7 @@ for resolution, train_dataset_path in enumerate(train_images_paths[1:]):
         
             if global_step % (config.print_steps//current_resolution) == 0:
                 misc.print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time, disc_loss, gen_loss)
-                misc.print_samples(generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
+                misc.print_samples(checkpoint_dir, generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
                 # misc.save_image_grid(generator, current_resolution, config.checkpoint_dir, global_step, random_vector_for_sampling=const_random_vector_for_saving)
         
             global_step += 1
@@ -186,7 +186,7 @@ for resolution, train_dataset_path in enumerate(train_images_paths[1:]):
         
             if global_step % (config.print_steps//current_resolution) == 0:
                 misc.print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time, disc_loss, gen_loss)
-                misc.print_samples(generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
+                misc.print_samples(checkpoint_dir, generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
                 # misc.save_image_grid(generator, current_resolution, config.checkpoint_dir, global_step, random_vector_for_sampling=const_random_vector_for_saving)
         
             global_step += 1
@@ -196,7 +196,7 @@ for resolution, train_dataset_path in enumerate(train_images_paths[1:]):
         if (epoch + 1) % config.save_images_epochs == 0:
             print("This images are saved at {} epoch".format(epoch+1))
             sample_images = generator(const_random_vector_for_saving,current_resolution,'training', training=False)
-            misc.print_samples(generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
+            misc.print_samples(checkpoint_dir, generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
             # misc.save_image_grid(generator, current_resolution, config.checkpoint_dir, epoch, random_vector_for_sampling=const_random_vector_for_saving)
 
         # saving (checkpoint) the model every save_epochs
