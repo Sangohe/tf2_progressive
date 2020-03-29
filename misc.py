@@ -44,7 +44,7 @@ def print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time
     print("Epochs: {:.2f} global_step: {} loss_D: {:.3g} loss_G: {:.3g} ({:.2f} examples/sec; {:.3f} sec/batch)".format(
             epochs, global_step, disc_loss, gen_loss, examples_per_sec, duration))        
 
-def print_samples(checkpoint_dir, generator, current_resolution, random_vector_for_sampling=None):
+def print_samples(checkpoint_dir, generator, current_resolution, random_vector_for_sampling=None, step=None):
     """Generates fake images using the Generator network and save them to results folder
     
     Arguments:
@@ -58,7 +58,7 @@ def print_samples(checkpoint_dir, generator, current_resolution, random_vector_f
                                                     minval=-1.0, maxval=1.0)
     sample_images = generator(random_vector_for_sampling, current_resolution, 'training')
     print('Ejecutar print_or_save_sample_images')
-    print_or_save_sample_images(checkpoint_dir, sample_images.numpy(), config.num_examples_to_generate, is_save=True)            
+    print_or_save_sample_images(checkpoint_dir, sample_images.numpy(), config.num_examples_to_generate, is_save=True, step=step)            
 
 def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=config.num_examples_to_generate,
                                 is_square=False, is_save=False, step=None):
