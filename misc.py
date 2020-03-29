@@ -60,8 +60,7 @@ def print_samples(checkpoint_dir, generator, current_resolution, random_vector_f
     print_or_save_sample_images(checkpoint_dir, sample_images.numpy(), config.num_examples_to_generate, is_save=True)            
 
 def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=config.num_examples_to_generate,
-                                is_square=False, is_save=False, epoch=None,
-                                checkpoint_dir=config.checkpoint_dir):
+                                is_square=False, is_save=False, epoch=None):
     available_print_size = list(range(1, 26))
     assert max_print_size in available_print_size
     if len(sample_images.shape) == 2:
