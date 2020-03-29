@@ -61,7 +61,7 @@ def print_samples(checkpoint_dir, generator, current_resolution, random_vector_f
     print_or_save_sample_images(checkpoint_dir, sample_images.numpy(), config.num_examples_to_generate, is_save=True)            
 
 def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=config.num_examples_to_generate,
-                                is_square=False, is_save=False, epoch=None):
+                                is_square=False, is_save=False, step=None):
     available_print_size = list(range(1, 26))
     assert max_print_size in available_print_size
     if len(sample_images.shape) == 2:
@@ -99,12 +99,12 @@ def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=co
         
         fig = plt.figure(figsize=(num_columns, num_columns))
         plt.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
-        # plt.imshow(print_images * 0.5 + 0.5)#, cmap='gray')
+        plt.imshow(print_images * 0.5 + 0.5)#, cmap='gray')
         plt.axis('off')
         
-    if is_save and epoch is not None:
+    if is_save and step is not None:
         print('entro guardar')
-        filepath = os.path.join(checkpoint_dir, 'image_at_epoch_{:04d}.png'.format(epoch))
+        filepath = os.path.join(checkpoint_dir, 'image_at_step_{:04d}.png'.format(step))
         print(filepath)
         plt.savefig(filepath)
     else:
