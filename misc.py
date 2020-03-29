@@ -103,6 +103,7 @@ def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=co
         
     if is_save and epoch is not None:
         filepath = os.path.join(checkpoint_dir, 'image_at_epoch_{:04d}.png'.format(epoch))
+        print(filepath)
         plt.savefig(filepath)
     else:
         plt.show()
