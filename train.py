@@ -149,7 +149,7 @@ for epoch in range(config.training_phase_epoch):
         generator_train_step(current_resolution, 'training')
         if global_step % (config.print_steps//current_resolution) == 0:
             misc.print_log(num_batches_per_epoch, global_epoch, step, global_step, start_time, disc_loss, gen_loss)
-            misc.print_samples(generator, current_resolution, const_random_vector_for_savingconst_random_vector_for_saving)
+            misc.print_samples(generator, current_resolution, random_vector_for_sampling=const_random_vector_for_saving)
         
         global_step += 1
     global_epoch += 1
