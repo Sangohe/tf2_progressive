@@ -123,18 +123,19 @@ def save_image_grid(generator, current_resolution, checkpoint_dir, global_step, 
         random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, config.noise_dim],
                                                     minval=-1.0, maxval=1.0)
     images = generator(random_vector_for_sampling, current_resolution, 'training').numpy()
+    np.save(os.path.join(checkpoint_dir, 'fake{:06}'.format(global_step)), images)
     print('image range [{},{}]'.format(images.min(), images.max()))
 
-    num, height, width, _ = images.shape
-    assert height == width
-    dim = np.sqrt(num).astype(int)
-    rows, row_num = [], 0
+    # num, height, width, _ = images.shape
+    # assert height == width
+    # dim = np.sqrt(num).astype(int)
+    # rows, row_num = [], 0
     
-    while row_num < dim:
-        rows.append(np.hstack(images[row_num * dim:(row_num + 1) * dim]))
-        row_num+=1
+    # while row_num < dim:
+    #     rows.append(np.hstack(images[row_num * dim:(row_num + 1) * dim]))
+    #     row_num+=1
         
-    np.save(os.path.join(checkpoint_dir, 'fake{:06}'.format(global_step)), np.vstack(rows))
+    # np.save(os.path.join(checkpoint_dir, 'fake{:06}'.format(global_step)), np.vstack(rows))
     
 
 def augment(data):
