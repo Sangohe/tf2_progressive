@@ -57,6 +57,7 @@ def print_samples(checkpoint_dir, generator, current_resolution, random_vector_f
         random_vector_for_sampling = tf.random.uniform([config.num_examples_to_generate, 1, 1, config.noise_dim],
                                                     minval=-1.0, maxval=1.0)
     sample_images = generator(random_vector_for_sampling, current_resolution, 'training')
+    print('Ejecutar print_or_save_sample_images')
     print_or_save_sample_images(checkpoint_dir, sample_images.numpy(), config.num_examples_to_generate, is_save=True)            
 
 def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=config.num_examples_to_generate,
@@ -102,10 +103,12 @@ def print_or_save_sample_images(checkpoint_dir, sample_images, max_print_size=co
         plt.axis('off')
         
     if is_save and epoch is not None:
+        print('entro guardar')
         filepath = os.path.join(checkpoint_dir, 'image_at_epoch_{:04d}.png'.format(epoch))
         print(filepath)
         plt.savefig(filepath)
     else:
+        print('entro mostrar')
         plt.show()
 
 def save_image_grid(generator, current_resolution, checkpoint_dir, global_step, random_vector_for_sampling=None):
