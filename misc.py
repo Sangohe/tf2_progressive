@@ -81,9 +81,9 @@ def print_or_save_sample_images(sample_images, max_print_size=config.num_example
         if channel == 1:
             print_images = np.squeeze(print_images, axis=-1)
 
-        # fig = plt.figure(figsize=(max_print_size, 1))
-        # plt.imshow(print_images * 0.5 + 0.5)#, cmap='gray')
-        # plt.axis('off')
+        fig = plt.figure(figsize=(max_print_size, 1))
+        plt.imshow(print_images * 0.5 + 0.5)#, cmap='gray')
+        plt.axis('off')
     
     else:
         num_columns = int(np.sqrt(max_print_size))
